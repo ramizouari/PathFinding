@@ -104,6 +104,7 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="SearchAlgorithm.cpp" />
+    <ClCompile Include="SearchAlgorithmList.cpp" />
     <QtRcc Include="PathFinding.qrc" />
     <QtUic Include="PathFinding.ui" />
     <QtMoc Include="PathFinding.h" />
@@ -118,6 +119,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="SearchAlgorithm.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="SearchAlgorithmList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

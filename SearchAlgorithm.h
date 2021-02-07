@@ -1,5 +1,6 @@
 #pragma once
 #include "qobject.h"
+#include <chrono>
 class RGrid;
 
 namespace metric
@@ -40,6 +41,7 @@ class SearchAlgorithm:public QObject
 {
 	Q_OBJECT
 public:
+	inline static std::chrono::milliseconds delay= std::chrono::milliseconds(20);
 	virtual ~SearchAlgorithm() = 0;
 	virtual void search(RGrid &G) const = 0;
 };
@@ -76,4 +78,13 @@ class BestSearch : public LSearch
 public:
 	BestSearch();
 	BestSearch(std::function<double(couple, couple)> h);
+};
+
+class BFS : public SearchAlgorithm
+{
+	void search(RGrid& G) const override;
+};
+class DFS : public SearchAlgorithm
+{
+	void search(RGrid& G) const override;
 };
