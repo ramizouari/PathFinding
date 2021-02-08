@@ -3,6 +3,10 @@
 #include <unordered_map>
 #include "SearchAlgorithm.h"
 #include "qactiongroup.h"
+
+/*
+* This class is responsible for managing Multiple pathfinding algorithms and their representation as QActions
+*/
 class SearchAlgorithmList :
     public QObject
 {

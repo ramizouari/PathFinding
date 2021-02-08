@@ -7,8 +7,10 @@
 #include <unordered_map>
 #include "RFrame.h"
 #include "SearchAlgorithm.h"
-inline constexpr int n = 40;
-inline constexpr int m = 40;
+//Number of rows
+inline constexpr int n = 41;
+//Number of columns
+inline constexpr int m = 41;
 class RGrid :
     public QWidget
 {
@@ -16,9 +18,13 @@ class RGrid :
     Q_OBJECT
 public:
     RGrid(QWidget* parent=nullptr);
+    //Checks whether a square with coordinates (a,b) is blocked
     bool is_blocked(int a, int b);
+    //Get the Thread in which the simulation plays
     QThread* getThread();
+    //Get the coordinates of the source
     std::pair<int, int> get_source() const;
+    //Get the cooridnates of the destination
     std::pair<int, int> get_dest() const;
     void set_source(RFrame *e);
     void set_destination(RFrame *e);
@@ -28,18 +34,34 @@ public slots:
     void explore_grid_interactive();
     void explore_grid_interactive(SearchAlgorithm *S);
     void explore_grid(SearchAlgorithm *S);
+    //Reset the grid
     void reset();
+    //Change the source
     void set_source(int, int);
+    //Change the destination
     void set_destination(int, int);
+    void initialize_empty();
+    void generate_maze();
 signals:
+    //Emitted when a square is explored
     void explored();
+    //Emitted when a square is visited
     void visited();
 private:
-    void generate_maze();
+    //The layout of the elements
     QGridLayout* grid;
+    //The Squares
     RFrame** elements;
+    /*
+    * - source: represents the cooridnates of the source
+    * - dest: represents the coordinates of the destination
+    */
     std::pair<int, int> source, dest;
+    /*
+    * The thread in which the simulation will play
+    */
     QThread *thread;
+    //This Mapper will map each frame to its coordinates
     std::unordered_map<RFrame*, std::pair<int, int>> element_mapper;
 
 };

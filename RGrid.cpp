@@ -6,9 +6,10 @@
 #include <thread>
 #include <chrono>
 #include <random>
+#include "Graph.h"
 
 RGrid::RGrid(QWidget* parent) :QWidget(parent), grid(new QGridLayout),
-elements(new RFrame* [n]), source({ 0,0 }), dest({ n - 1,m - 1 })
+elements(new RFrame* [n])
 {
 	for (int i = 0; i < n; i++)
 	{
@@ -43,10 +44,8 @@ elements(new RFrame* [n]), source({ 0,0 }), dest({ n - 1,m - 1 })
 			elements[a][b].visit();
 			emit visited();
 		});
-	elements[0][0].set_as_source();
-	elements[n - 1][m - 1].set_as_destination();
 	setMouseTracking(true);
-	//generate_maze();
+	generate_maze();
 	setMinimumSize({ 300,300 });
 	setSizeIncrement({ 1,1 });
 }
@@ -116,59 +115,22 @@ std::pair<int, int> RGrid::get_dest() const
 
 void RGrid::generate_maze()
 {
-	using couple = std::pair<int, int>;
-	static std::random_device device;
-	static auto completely_blocked = [](const std::vector<std::vector<bool>> &B,couple w) 
-	{
-		int r;
-		for(int i=0;i<=1;i++)
-			for (int j = 0; j <= 1; j++)
-			{
-				r = 0;
-				for (int a = std::max(w.first - i, 0); a < std::min(w.first - i + 2, n); a++)
-					for (int b = std::max(w.second - j, 0); b < std::min(w.second - j + 2, m); b++)
-						if (B[a][b])
-							r++;
-				if (r >= 2)
-					return true;
-			}
-		return false;
-	};
-	std::mt19937_64 e(device());
-	std::vector<std::vector<bool>> blocked(n, std::vector<bool>(m, false));
-	std::vector<std::vector<bool>> visited(n, std::vector<bool>(m, false));
-	std::stack<couple> T;
-	std::uniform_int_distribution d1(0,n-1),d2(0,m-1);
-	couple p = { d1(e),d2(e) };
-visited[p.first][p.second] = true;
-	T.push(p);
-	while (!T.empty())
-	{
-		auto [a,b] = T.top();
-		if (!completely_blocked(blocked, T.top()))
-		{
-			blocked[a][b] = true;
-			elements[a][b].set_as_blocked();
-		}
-		
-		T.pop();
-		std::vector<couple> A;
-		for (int i = std::max(a-1,0); i < std::min(a+2,n);i++)
-			for (int j = std::max(b - 1, 0); j < std::min(b + 2, m); j++)
-			{
-				if (i == a && j == b || i!=a && j!=b)
-					continue;
-				if (visited[i][j])
-					continue;
-				if (completely_blocked(blocked, { i,j }))
-					continue;
-				visited[i][j] = true;
-				A.push_back({ i,j });
-			}
-		std::shuffle(A.begin(), A.end(),e);
-		for (const auto& s : A)
-			T.push(s);
-	}
+	GridGraph G((n+1) / 2, (m+1) / 2);
+	auto B = G.kruskal().convert();
+	auto a= B.size(), b =  B[0].size() ;
+	for (int i = 0; i < a; i++)
+		for (int j = 0; j < b; j++)
+			if (!B[i][j])
+				elements[i][j].set_as_blocked();
+			else elements[i][j].set_as_normal();
+	if (n % 2 == 0) for (int j = 0; j < m; j++)
+		if (elements[n - 2][j].blocked()) elements[n - 1][j].set_as_blocked();
+	if (m % 2 == 0) for (int i = 0; i < n; i++)
+		if (elements[i][m-2].blocked()) elements[i][m-1].set_as_blocked();
+	elements[0][0].set_as_source();
+	elements[n - 1][m - 1].set_as_destination();
+	source = { 0,0 }; 
+	dest = { n - 1,m - 1 };
 }
 
 void RGrid::set_source(RFrame* e)
@@ -261,4 +223,15 @@ void RGrid::set_source(int a, int b)
 void RGrid::set_destination(int a, int b)
 {
 	dest = { a,b };
+}
+
+void RGrid::initialize_empty()
+{
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < m; j++)
+			elements[i][j].set_as_normal();
+	elements[0][0].set_as_source();
+	elements[n - 1][m - 1].set_as_destination();
+	source = { 0,0 };
+	dest = { n - 1,m - 1 };
 }

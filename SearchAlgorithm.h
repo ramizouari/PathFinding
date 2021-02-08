@@ -3,6 +3,12 @@
 #include <chrono>
 class RGrid;
 
+/*
+* This namespace represents the standard lp metrics for p in [1,+inf] with 3 special metrics:
+* -l1 is the manhatten distance
+* -l2 is the euclidean distance
+* -linf is the maximum distance
+*/
 namespace metric
 {
 	using couple = std::pair<double, double>;
@@ -37,6 +43,10 @@ namespace metric
 	};
 }
 
+/*
+* This class is the base class of Pathfinding algorithms
+* The search method is the method which deals with simulating pathfinding for the RGrid
+*/
 class SearchAlgorithm:public QObject
 {
 	Q_OBJECT
@@ -46,6 +56,11 @@ public:
 	virtual void search(RGrid &G) const = 0;
 };
 
+/*
+* This class represents a family of pathfinding algorithms, parameterized by
+* 1. An angle theta
+* 2. a metric h
+*/
 class LSearch : public SearchAlgorithm
 {
 	double theta;
@@ -57,6 +72,9 @@ public:
 	void search(RGrid& G) const override;
 };
 
+/*
+* - A* Algorithm
+*/
 class ASharp : public LSearch
 {
 public:
